@@ -1,0 +1,106 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: {{ .Values.executionEnvironment.name}}
+  name: {{ .Values.executionEnvironment.name}}
+spec:
+  ports:
+    - port: 80
+      protocol: TCP
+      targetPort: 8080
+  selector:
+    app: {{ .Values.executionApi.name}}
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: {{ .Values.executionApi.name }}
+  name: {{ .Values.executionApi.name }}
+spec:
+  ports:
+    - port: 80
+      protocol: TCP
+      targetPort: 80
+  selector:
+    app: {{ .Values.executionApi.name }}
+  type: ClusterIP
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.executionApi.name }}
+  labels:
+    app: {{ .Values.executionApi.name }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ .Values.executionApi.name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.executionApi.name }}
+    spec:
+      volumes:
+        - name: shared-volume
+          persistentVolumeClaim:
+            claimName: {{ .Release.Name }}-workflow-logs-pvc
+      containers:
+        - name: {{ .Values.executionApi.name }}
+          image: {{ .Values.executionApi.image }}
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 80
+          env:
+            - name: WORKFLOW_LOGS_PATH
+              value: {{ .Values.global.workflow_log_path }}
+            - name: WORKFLOW_DB
+              value: {{ .Values.mongodb.workflowdb.name }}
+            - name: WORKFLOW_COLLECTION
+              value: {{ .Values.mongodb.workflowdb.collection }}
+            - name: CODE_GENERATOR_EXCHANGE_NAME
+              value: {{ .Values.codeGenerator.exchange_name }}
+            - name: CODE_GENERATOR_ROUTING_KEY
+              value: {{ .Values.codeGenerator.routing_key }}
+            - name: EXECUTION_API_INGRESS_PATH
+              value: {{ .Values.global.execution_api_ingress_path }}
+            - name: SERVICES_API_INGRESS_PATH
+              value: {{ .Values.global.services_api_ingress_path }}
+            - name: SIB_MANAGER_API_INGRESS_PATH
+              value: {{ .Values.global.sib_manager_ingress_path }}
+            - name: DATA_MANAGER_API_INGRESS
+              value: {{ .Values.global.data_manager_ingress_path }}
+            - name: RABBITMQ_USERNAME
+              value: {{ .Values.rabbitmq.auth.username }}
+            - name: RABBITMQ_PASSWORD
+              value: {{ .Values.rabbitmq.auth.password }}
+            - name: CINCO_DE_BIO_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+          volumeMounts:
+            - name: shared-volume
+              mountPath: /app/data
+        - name: {{ .Values.executionEnvironment.name}}
+          image: {{ .Values.executionEnvironment.image }}
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080
+          env:
+            - name: WORKFLOW_LOGS_PATH
+              value: {{ .Values.global.workflow_log_path }}
+            - name: CODE_GENERATOR_EXCHANGE_NAME
+              value: {{ .Values.codeGenerator.exchange_name }}
+            - name: CODE_GENERATOR_ROUTING_KEY
+              value: {{ .Values.codeGenerator.routing_key }}
+            - name: CINCO_DE_BIO_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+          volumeMounts:
+            - name: shared-volume
+              mountPath: /app/data
+      

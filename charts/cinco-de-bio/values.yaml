@@ -1,0 +1,99 @@
+minio:
+  # This is is currently the work around for accessing the minio console (ip address is from multipass)
+  nameOverride: "minio"
+  fullnameOverride: "minio"
+  buckets:
+    experimentBucket: "experiment-bucket"
+    workflowBucket: "workflow-bucket"
+    resultsBucket: "results-bucket"
+  # default login details for minio
+  auth:
+    rootUser: admin
+    rootPassword: mypassword
+  mode: "standalone"
+  # creates the original buckets
+  defaultBuckets: experiment-bucket;workflow-bucket;results-bucket
+  extraEnvVars:
+      # This is the workaround for accessing the minio console - need to resolve (as it depends on the ip address of the multipass VM for microk8s)
+      - name: MINIO_BROWSER_REDIRECT_URL
+        value: "http://192.168.64.2/minio-console/"
+
+rabbitmq:
+  nameOverride: "rabbitmq"
+  fullnameOverride: "rabbitmq"
+  # default login details for rabbitmq
+  auth:
+    username: "myuser"
+    password: "mypassword"
+
+mongodb:
+  image: mongo:latest
+  workflowdb:
+    name: "workflows"
+    collection: "flows"
+  jobsdb:
+    name: "jobsdb"
+    collection: "jobs"
+
+nginxProxy:
+  image: nginx:latest
+  name: nginxproxy
+
+jobsApi:
+  image: sccecincodebio/jobs-api:latest
+  name: jobs-api
+
+dataManager:
+  image: sccecincodebio/data-manager:latest
+  name: data-manager
+
+executionApi:
+  image: sccecincodebio/execution-api:latest
+  name: execution-api
+
+serviceApi:
+  image: sccecincodebio/service-api:latest
+  name: service-api
+
+codeGenerator:
+  image: sccecincodebio/code-generator:latest
+  name: code-generator
+  exchange_name: "code-generator-exchange"
+  routing_key: "code-generator"
+
+sibManager:
+  image: sccecincodebio/sib-manager:latest
+  name: sib-manager
+  kaniko:
+    image: "gcr.io/kaniko-project/executor:latest"
+    namespace: "default"
+    context_pvc_name: "kaniko-context"
+    context_pvc_mount_path: "/docker-build"
+
+executionEnvironment:
+  image: sccecincodebio/execution-environment:latest
+  name: execution-environment
+
+
+global:
+  ontology_url: "https://raw.githubusercontent.com/colm-brandon-ul/cellmaps/master/ontology/cellmaps.owl"
+  dps_registry: "http://"
+  docker_hub_namespace: "sccecellmaps"
+  workflow_log_path: "data/workflow-logs"
+  dps_name_space: "dataprocessing-service-namespace"
+  # These are the default values for the cluster image registry with microk8s
+  # However these may need to be changed depending on the cluster
+  cluster_image_registry:
+    name: "registry"
+    namespace: "container-registry"
+    port: 5000
+    domain_on_host: "localhost:32000" # This is the domain name that the registry is exposed on the host (i.e. inside the VM)
+  execution_api_ingress_path: 'execution-api'
+  services_api_ingress_path: 'services-api'
+  sib_manager_ingress_path: 'sib-manager'
+  data_manager_ingress_path: 'data-manager'
+  jobs_api_ingress_path: 'jobs-api'
+  minio_console_ingress_path: 'minio-console'
+  minio_presigned_ingress_path: 'minio-presigned'
+  application_namespace: "default"
+  
