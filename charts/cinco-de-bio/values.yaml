@@ -81,6 +81,9 @@ global:
   containers:
     dps_registry: "http://"
     docker_hub_namespace: "sccecellmaps"
+    # not default values (therefore they need to be set via the command line)
+    docker_hub_password:
+    docker_hub_username:
     cluster_image_registry:
       name: "registry"
       namespace: "container-registry"
