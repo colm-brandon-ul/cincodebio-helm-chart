@@ -28,7 +28,7 @@ spec:
                 port:
                   number: 80
           # Definitely needs to be available outside the cluster
-          - path: /{{ .Values.global.execution_api_ingress_path }}/(.*)$
+          - path: /{{ .Values.global.ingress_paths.execution_api_ingress_path }}/(.*)$
             pathType: Prefix
             backend:
               service:
@@ -36,7 +36,7 @@ spec:
                 port:
                   number: 80
 
-          - path: /{{ .Values.global.jobs_api_ingress_path }}/(.*)$
+          - path: /{{ .Values.global.ingress_paths.jobs_api_ingress_path }}/(.*)$
             pathType: Prefix
             backend:
               service:
@@ -44,7 +44,7 @@ spec:
                 port:
                   number: 80
           # Definitely needs to be available outside the cluster
-          - path: /{{ .Values.global.services_api_ingress_path }}/(.*)$
+          - path: /{{ .Values.global.ingress_paths.services_api_ingress_path }}/(.*)$
             pathType: Prefix
             backend:
               service:
@@ -52,7 +52,7 @@ spec:
                 port:
                   number: 80
           # Definitely needs to be available outside the cluster
-          - path: /{{ .Values.global.minio_console_ingress_path }}/(.*)$
+          - path: /{{ .Values.global.ingress_paths.minio_console_ingress_path }}/(.*)$
             pathType: Prefix
             backend:
               service:
@@ -60,7 +60,7 @@ spec:
                 port:
                   number: 9001
           # Definitely needs to be available outside the cluster
-          - path: /{{ .Values.global.minio_presigned_ingress_path }}/(.*)$
+          - path: /{{ .Values.global.ingress_paths.minio_presigned_ingress_path }}/(.*)$
             pathType: Prefix
             backend:
               service:
@@ -68,7 +68,7 @@ spec:
                 port:
                   number: 80
           # Definitely needs to be available outside the cluster
-          - path: /{{ .Values.global.sib_manager_ingress_path }}/(.*)$
+          - path: /{{ .Values.global.ingress_paths.sib_manager_ingress_path }}/(.*)$
             pathType: Prefix
             backend:
               service:
@@ -76,7 +76,7 @@ spec:
                 port:
                   number: 80
           
-          - path: /{{ .Values.global.data_manager_ingress_path }}/(.*)$
+          - path: /{{ .Values.global.ingress_paths.data_manager_ingress_path }}/(.*)$
             pathType: Prefix
             backend:
               service:
@@ -84,4 +84,4 @@ spec:
                 port:
                   number: 80
 
-     
+
